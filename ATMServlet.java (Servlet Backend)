@@ -1,0 +1,51 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class ATMServlet extends HttpServlet {
+    private double balance = 1000.00;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String operation = request.getParameter("operation");
+        String amountStr = request.getParameter("amount");
+        double amount = 0;
+
+        if (amountStr != null && !amountStr.isEmpty()) {
+            amount = Double.parseDouble(amountStr);
+        }
+
+        String result = "";
+
+        switch (operation) {
+            case "balance":
+                result = "Your balance is: $" + balance;
+                break;
+            case "deposit":
+                if (amount > 0) {
+                    balance += amount;
+                    result = "Deposited $" + amount + ". New balance: $" + balance;
+                } else {
+                    result = "Enter a valid deposit amount.";
+                }
+                break;
+            case "withdraw":
+                if (amount > 0 && amount <= balance) {
+                    balance -= amount;
+                    result = "Withdrew $" + amount + ". Remaining balance: $" + balance;
+                } else {
+                    result = "Invalid or insufficient funds.";
+                }
+                break;
+            default:
+                result = "Invalid operation selected.";
+        }
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<html><body>");
+        out.println("<h2>" + result + "</h2>");
+        out.println("<a href='atm.html'>Back</a>");
+        out.println("</body></html>");
+    }
+}
